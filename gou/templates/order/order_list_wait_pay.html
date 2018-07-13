@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+
+    <h3>待付款订单列表</h3>
+    <a href="/ind/mine/"><button>返回我的</button></a>
+    {% if not wait %}
+    <h3>😊没有付款的商品哦😊<br>
+        可以去这里看看👉<a href="{% url 'axf:ma' %}">点击我^_^</a></h3>
+    {% endif %}
+    {% for i in wait %}
+    <ul>
+        <!--订单信息展示-->
+        <hr style="height: 10px;background-color: #5bc0de">
+        {% for a in i.ordergoodsmodel_set.all %}
+            <li>
+                <a href="{% url 'axf:Ordercreate' i.id %}">
+
+                    <p><!-- 订单id -->订单编号：{{ i.id }}</p>
+                    <p><!-- 数量 -->商品数量：{{ a.goods_num }}</p>
+                        <!--展示商品的名称-->
+                    <p>商品名称：{{ a.goods.productlongname }}</p>
+                        <li>
+                            <img src="{{ a.goods.productimg }}" alt="">
+                        </li>
+                        <!--处理结束-->
+
+                </a>
+            </li>
+            {% endfor %}
+        <!--订单处理结束-->
+        <a href="{% url 'axf:Ordercreate' i.id %}">
+        <button class="btn btn-success btn-block">点击支付</button>
+        </a>
+        <a href="{% url 'axf:delorder' i.id %}">
+        <button class="btn btn-success btn-block" style="background-color: red">点击删除</button>
+        </a>
+    {% endfor %}
+
+    </ul>
+
+
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends 'base_main.html' %}
+{% load static %}
+{% block extCSS %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'app/market/market.css' %}">
+{% endblock %}
+
+{% block EXTJS %}
+    <script type="text/javascript" src="{% static 'app/market/js/market.js' %}"></script>
+{% endblock %}
+
+
+{% block content %}
+
+    <div id="market">
+
+        <aside>
+
+            <ul>
+                {% for i in food %}
+                <!--闪购分类展示-->
+                    <li>
+                        <!--链接地址，点击获取分类下的商品信息-->
+                        <a href="{% url 'axf:market' i.typeid 0 0 %}">{{ i.typename }}</a>
+                            {% ifequal i.typid tpid %}
+                            <span class="yellowSlide"></span>
+                            {% endifequal %}
+                    </li>
+                <!--处理数据结束-->
+                {% endfor %}
+            </ul>
+
+        </aside>
+
+
+        <section>
+            <nav>
+                <ul>
+                    <li id="all_types"><span>全部类型<span id="all_type_logo"
+                                                       class="glyphicon glyphicon-chevron-down"></span></span></li>
+                    <li id="sort_rule"><span>综合排序<span id="sort_rule_logo" class="glyphicon glyphicon-chevron-down"></span></span></li>
+                </ul>
+            </nav>
+
+            <menu>
+                <ul>
+
+                    <!--商品信息展示-->
+                    {% for i in good %}
+                        <li>
+                            <a href="#">
+                                <img src="{{ i.productimg }}" alt="">
+                                <div class="shoppingInfo">
+                                    <h6>{{ i.productlongname }}</h6>
+                                    <p class="detailTag">
+                                        <span>精选</span>
+                                        {% if i.productname %}
+                                        <span>{{ i.productname }}</span>
+                                        {% endif %}
+                                    </p>
+                                    <p class="unit">
+                                        {{ i.specifics }}
+                                    </p>
+                                    <p class="price">
+                                        <span>¥{{ i.price }}</span>
+                                        <s>¥{{ i.marketprice }}</s>
+                                    </p>
+                                </div>
+                            </a>
+                        <section>
+                            {% csrf_token %}
+                            <button onclick="delshop({{ i.id }})">-</button>
+
+                            <span id="num{{ i.id }}")>
+                                {% ifequal i.cartmodel_set.all.get.user_id user %}
+{#                                {% if i.cartmodel_set.all.first %}#}
+                                    {{ i.cartmodel_set.all.first.c_num }}
+                                {% else %}
+                                    0
+{#                                {% endif %}#}
+                                {% endifequal %}
+                            </span>
+
+                            <button onclick="addshop({{ i.id }})">+</button>
+                        </section>
+                        </li>
+                    <!--处理数据结束-->
+                    {% endfor %}
+                </ul>
+
+                <div id="all_types_container">
+                    <div>
+                        <!--加载全部分类的数据-->
+                        {% for i in fenlei %}
+                            <a href="{% url 'axf:market' tpid i.1 0 %}">
+{#                            数据切片方式在这用.表示#}
+                                <span>{{ i.0 }}</span>
+                            </a>
+                        <!--处理数据结束-->
+                        {% endfor %}
+
+                    </div>
+                </div>
+
+
+                <div id="sort_container">
+                    <div>
+{#      排序传递的也是状态码   0 , 1 ,2  , 3 ,4 ,5...                    #}
+                        <a href="{% url 'axf:market' tpid cid 0 %}">
+                            <span>综合排序</span>
+                        </a>
+                        <a href="{% url 'axf:market' tpid cid 1 %}">
+                            <span>销量排序</span>
+                        </a>
+                        <a href="{% url 'axf:market' tpid cid 2 %}">
+                            <span>价格降序</span>
+                        </a>
+                        <a href="{% url 'axf:market' tpid cid 3 %}">
+                            <span>价格升序</span>
+                        </a>
+
+                    </div>
+                </div>
+
+            </menu>
+
+        </section>
+
+
+    </div>
+
+
+{% endblock %}
