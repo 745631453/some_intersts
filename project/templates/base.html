@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>{% block title %}
+
+{% endblock %}</title>
+
+    {% block CSS %}
+
+    {% endblock %}
+{% block csses %}
+
+{% endblock %}
+</head>
+<body>
+{% block header %}
+
+{% endblock %}
+
+{% block content %}
+
+{% endblock %}
+
+
+{% block foot %}
+
+{% endblock %}
+
+
+<script type="text/javascript" src="{% static 'js/jquery-1.7.2.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/all.js' %}"></script>
+{% block JS %}
+
+{% endblock %}
+
+</body>
+</html>

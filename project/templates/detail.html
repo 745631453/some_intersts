@@ -1,0 +1,275 @@
+{% extends 'base_mine.html' %}
+{% load static %}
+{% block title %}
+    {{ data.house.title }}
+{% endblock %}
+
+    {% block csses %}
+
+
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <link rel="stylesheet" href="{% static 'css/newDetail.css' %}">
+    <link rel="stylesheet" href="{% static 'css/newzufang.css' %}">
+    <link rel="stylesheet" href="{% static 'css/xcConfirm.css' %}">
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/xcConfirm.js' %}"></script>
+
+    <style>
+        .selected1{
+            opacity: 1 !important;
+        }
+        .selected{
+            opacity: 0.5;
+        }
+
+    </style>
+{% endblock %}
+    {% block content %}
+
+
+    {% csrf_token %}
+    <div class="content-wrapper">
+        <div class="title-wrapper">
+            <div class="content">
+                <div class="title">
+                    <h1 class="main">{{ data.house.title }}</h1>
+                    <div class="sub">这个经纪人很懒，没写核心卖点</div>
+                </div>
+
+                <div id="house_id" style="display: none">{{ data.house.house_id }}</div>
+                <div class="btnContainer " style="display: none;"><button id="follow1">关注房源</button></div>
+                <div class="btnContainer " style="display: none;"><button id="follow2" style="background-color: red;">取消关注</button></div>
+            </div>
+        </div>
+
+        <div class="overview">
+            <div class="img" id="topImg">
+                <div class="imgContainer">
+                    <img src="{{ data.house.index_img_url }}" alt="">
+                    <div class="loading" style="display: none;"></div>
+                </div>
+                <div class="thumbnail">
+                    <ul id="img_ul">
+                        {% for img_url in data.house_img %}
+                            <li data-src=""  class="selected">
+                                <img src="{{ img_url.url }}" alt="">
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="pre">&lt;</div>
+                    <div class="next">&gt;</div>
+                </div>
+            </div>
+            <div class="content zf-content">
+                <div class="price ">
+                    <span class="total">{{ data.house.price }}</span>
+                    <span class="unit">
+                        <span>元/月</span>
+                    </span>
+                    <div class="removeIcon"></div>
+                </div>
+                <div class="zf-room">
+                    <p class="lf"><i>面积：</i>{{ data.house.acreage }}平米</p>
+                    <p class="lf"><i>房屋户型：</i>{{ data.house_type.type_name }}</p>
+                    <p class="lf"><i>楼层：</i>{{ data.house_detail.floor }}</p>
+                    <p class="lf"><i>房屋朝向：</i>{{ data.house_detail.house_head }}</p>
+                    <div class="clear"></div>
+                    <p><i>小区：</i>
+                        <a href="#">{{ data.house_detail.community }}</a>
+                    </p>
+                    <p><i>位置：</i>
+                        <a href="#">{{ data.house_area.name }}</a>
+                        <a href="#">{{ data.house.address }}</a>
+                    </p>
+                    <div class="clear"></div>
+                </div>
+                <div class="brokerInfo" log-mod="zufang_detail_diamond-first">
+                    <a href="#">
+                        <img class="LOGCLICK" data-log_id="20001" data-bl="agent" data-el="1000000020384203" src="{{ data.user.avatar }}" alt="">
+                    </a>
+                    <div class="brokerInfoText">
+                        <div class="brokerName">
+                            <a href="https://dianpu.lianjia.com/1000000020384203" class="name LOGCLICK" data-log_id="20001" data-bl="agent" data-el="1000000020384203">{{ data.user.nick_name }}</a>
+                        </div>
+                        <div class="phone">{{ data.user.phone}}</div>
+                    </div>
+                </div>
+                <div class="houseRecord">
+                    <span class="houseNum">房屋编号：{{ data.house.house_id }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-wrapper introduction-wrapper" id="introduction">
+    	<div class="introduction">
+    		<div class="title">房源介绍</div>
+    		<div class="introContent">
+    			<div class="base">
+    				<div class="name">基本属性</div>
+    				<div class="content">
+    					<ul>
+    						<li><span class="label">租赁方式：</span>{{ data.house_detail.lease }}</li>
+    						<li><span class="label">付款方式：</span>{{ data.house_detail.pay_way }}</li>
+    						<li><span class="label">房屋现状：</span>{{  data.house.house_status }}</li>
+    						<li><span class="label">供暖方式：</span></li>
+    					</ul>
+    				</div>
+    			</div>
+    			<div class="feature">
+    				<div class="name">房源特色</div>
+    				<div class="zf-tag">
+    					<ul class="se">
+                            {% for a, b in data.fac %}
+                                {% if b %}
+                                    <li class="{{ a.css }} tags"><span></span>{{ a.facility_name }}<p></p></li>
+                                {% else %}
+                                    <li class="{{ a.css }}"><span></span>{{ a.facility_name }}<p></p></li>
+                                {% endif %}
+
+                            {% endfor %}
+
+                        </ul>
+                        <div class="clear"></div>
+                    </div>
+                    <div class="featureContent">
+                    	<ul>
+                    		<li><span class="label">小区介绍：</span><span class="text">{{ data.house_detail.surround_facility }}</span>
+                    		</li>
+                     		<li><span class="label">交通出行：</span><span class="text">{{ data.house_detail.transportation }}</span>
+                     		</li>
+                     	</ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+            var house_id = $("#house_id").text();
+            var csrf = $("input[name='csrfmiddlewaretoken']").val();
+            var less = 0;
+            var lis = $("#img_ul li"),
+                curIndex =  0;
+                length = lis.length;
+
+            $("#img_ul li").eq(curIndex ).addClass("selected1");
+            $("#img_ul").on("click", "li" ,function () {
+
+                let src1 = $(this).children("img").attr("src");
+                $("#topImg .imgContainer img").attr("src", src1);
+                $(this).addClass("selected1").siblings("li").removeClass("selected1");
+
+            });
+        $(".next").click(function () {
+            if (curIndex < length-1){
+                curIndex++;
+                $("#img_ul li").eq(curIndex).addClass("selected1").siblings("li").removeClass("selected1");
+                let src1 = $("#img_ul li").eq(curIndex).children("img").attr("src");
+                $("#topImg .imgContainer img").attr("src", src1);
+            }
+
+            if (curIndex > 2 && curIndex <= length-2) {
+                less += -115;
+                $(".thumbnail").css("overflow", "hidden");
+                $("#img_ul").css("position", "absolute");
+                $("#img_ul").css("left", less);
+            }
+        });
+
+        $(".pre").click(function () {
+            if (curIndex > 0){
+                curIndex--;
+                $("#img_ul li").eq(curIndex ).addClass("selected1").siblings("li").removeClass("selected1");
+                let src1 = $("#img_ul li").eq(curIndex).children("img").attr("src");
+                $("#topImg .imgContainer img").attr("src", src1);
+            }
+            if(curIndex > 1 && curIndex < length-2){
+                less+=115;
+                $(".thumbnail").css("overflow", "hidden");
+                $("#img_ul").css("position","absolute");
+                $("#img_ul").css("left",less);
+            }
+
+        });
+        $("#follow1").click(function () {
+            $.ajax({
+                url:'/detail/collect/',
+                headers:{'X-CSRFToken':csrf},
+                type:'post',
+                data:{'house_id':house_id, 'method':'2'},
+                dataType:'json',
+                success:function (msg) {
+                    if (msg['code'] === 1){
+                        $('#follow1').parent("div").hide();
+                        $('#follow2').parent("div").show();
+                        var txt=  "关注成功";
+                        window.wxc.xcConfirm(txt, window.wxc.xcConfirm.typeEnum.success);
+                    }else if(msg['code'] === 5){
+                        var txt=  "请先登录";
+                        window.wxc.xcConfirm(txt, window.wxc.xcConfirm.typeEnum.info);
+                    }else if(msg['code'] === 0){
+                        var txt=  "关注失败";
+                        window.wxc.xcConfirm(txt, window.wxc.xcConfirm.typeEnum.warning);
+                    }
+                },
+                error:function () {
+                    var txt=  "请求失败";
+                    window.wxc.xcConfirm(txt, window.wxc.xcConfirm.typeEnum.error);
+                }
+            })
+        });
+        $("#follow2").click(function () {
+            $.ajax({
+                url:'/detail/collect/',
+                headers:{'X-CSRFToken':csrf},
+                type:'post',
+                data:{'house_id':house_id,'method':'3'},
+                dataType:'json',
+                success:function (msg) {
+                    if (msg['code'] === 1){
+                        $('#follow2').parent("div").hide();
+                        $('#follow1').parent("div").show();
+                        var txt=  "取消成功";
+                        window.wxc.xcConfirm(txt, window.wxc.xcConfirm.typeEnum.success);
+                    }else if(msg['code'] === 5){
+                        var txt=  "请先登录";
+                        window.wxc.xcConfirm(txt, window.wxc.xcConfirm.typeEnum.info);
+                    }else if(msg['code'] === 0){
+                        var txt=  "取消失败";
+                        window.wxc.xcConfirm(txt, window.wxc.xcConfirm.typeEnum.warning);
+                    }
+                },
+                error:function () {
+                    var txt=  "取消失败";
+                    window.wxc.xcConfirm(txt, window.wxc.xcConfirm.typeEnum.error);
+                }
+            });
+        });
+         $(function () {
+            $.ajax({
+                url:'/detail/collect/',
+                headers:{'X-CSRFToken':csrf},
+                type:'post',
+                data:{'house_id':house_id,'method':'1'},
+                dataType:'json',
+                success:function (msg) {
+                    if (msg['code'] === 1){
+                        $('#follow1').parent("div").hide();
+                        $('#follow2').parent("div").show();
+                    }else {
+                        $('#follow2').parent("div").hide();
+                        $('#follow1').parent("div").show();
+                    }
+                },
+                error:function () {
+                    var txt=  "刷新关注信息失败";
+					window.wxc.xcConfirm(txt, window.wxc.xcConfirm.typeEnum.confirm);
+                }
+            });
+        });
+
+    </script>
+
+
+{% endblock %}
